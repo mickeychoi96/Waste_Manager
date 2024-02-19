@@ -8,12 +8,17 @@
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseStorage
 
 class PostDetailViewController: UIViewController {
     
     let postDetailView = PostDetailView()
     
-    let db = Firestore.firestore()
+    let postManager = PostManager.shared
+    
+    let db = Database.shared
+    
+    let storageRef = Storage.storage().reference()
     
     public var post: Post?
     
@@ -51,16 +56,72 @@ class PostDetailViewController: UIViewController {
                 self.navigationItem.rightBarButtonItem = deleteButton
             }
         }
+        
+        postDetailView.likeButton.addTarget(self, action: #selector(heartButtonPressed), for: .touchUpInside)
+        updateLikeUI(userEmail: Auth.auth().currentUser?.email ?? "")
+    }
+    
+    @objc func heartButtonPressed() {
+        if let userEmail = Auth.auth().currentUser?.email{
+            let documentID = self.post!.document
+            let isLiked = self.post!.likedUserIDs.contains(userEmail)
+            
+            db.updateLike(documentID, isLiked) {
+                DispatchQueue.main.async {
+                    if !isLiked {
+                        self.post!.likedUserIDs.insert(userEmail)
+                    } else {
+                        self.post!.likedUserIDs.remove(userEmail)
+                    }
+                    self.postManager.updatePost(self.post!)
+                    self.updateLikeUI(userEmail: userEmail)
+                }
+            }
+        }
     }
     
     @objc func deleteButtonTapped() {
+        presentDeleteAlert()
+    }
+    
+    private func presentDeleteAlert() {
+        let alert = UIAlertController(title: "Delete Post", message: "Do you want to delete the post?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { _ in
+            self.deletePost()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func deletePost() {
         if let post = post {
-            db.collection(K.collection).document(post.document).delete() { err in
-                if let err = err {
-                    print("Error removing document: \(err)")
+            let storage = Storage.storage()
+            let storageRef = storage.reference(forURL: post.imageUI)
+            
+            storageRef.delete { error in
+                if let error = error {
+                    print(error)
                 } else {
-                    print("Document successfully removed!")
+                    print("Image successfully removed!")
                 }
+            }
+            
+            db.deletePost(post)
+            postManager.deletePost(post)
+        }
+        
+        
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    func updateLikeUI(userEmail: String) {
+        if let post = post{
+            postDetailView.likeCount.text = String(post.likedUserIDs.count)
+            if post.likedUserIDs.contains(userEmail) {
+                postDetailView.likeButton.tintColor = .red
+            } else {
+                postDetailView.likeButton.tintColor = .gray
             }
         }
     }

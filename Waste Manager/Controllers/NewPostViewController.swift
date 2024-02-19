@@ -14,14 +14,16 @@ import FirebaseStorage
 class NewPostViewController: UIViewController, UINavigationControllerDelegate {
     
     let newPostView = NewPostView()
-        
-    let db = Firestore.firestore()
     
+    let db = Database.shared
+            
     let imagePicker = UIImagePickerController()
     
-    let categories = Categories.categories
+    let categories = CategoryManager.shared
     
     var category: String?
+    
+    let postManager = PostManager.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,11 +59,8 @@ class NewPostViewController: UIViewController, UINavigationControllerDelegate {
                 switch result {
                 case .success(let downloadURL):
                     let post = Post(userID: Auth.auth().currentUser!.email!, imageUI: downloadURL.absoluteString, date: Date().description, text: detail, likedUserIDs: [], category: self.category ?? "Default", document: "")
-                    do {
-                        try self.db.collection("post").document().setData(from: post)
-                    } catch let error {
-                        print("Error writing post to Firestore: \(error)")
-                    }
+                    self.db.addPost(post)
+                    self.postManager.addPost(post)
                 case .failure(let error):
                     print("Error uploading image to Storage: \(error)")
                 }
@@ -71,7 +70,6 @@ class NewPostViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     @objc func imageViewTapped() {
-        print("it works")
         present(imagePicker, animated: true, completion: nil)
     }
     
@@ -125,16 +123,16 @@ extension NewPostViewController: UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return categories.count
+        return categories.getCategoriesUsed().count
     }
 }
 
 extension NewPostViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return categories[row].name
+        return categories.getCategoriesUsed()[row].name
     }
 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.category = categories[row].name
+        self.category = categories.getCategoriesUsed()[row].name
     }
 }

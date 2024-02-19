@@ -11,49 +11,30 @@ import FirebaseFirestore
 import FirebaseStorage
 
 class HomeViewController: UIViewController, UINavigationControllerDelegate {
-    
+        
     let homeView = HomeView()
     
-    var posts = Posts.posts
+    let db = Database.shared
+    
+    let postManager = PostManager.shared
+    
+    let categories = CategoryManager.shared
     
     var randomInt = 0
-    
-    let db = Firestore.firestore()
-
-    let used = Categories.categoriesUsed
-    
+        
     let imagePicker = UIImagePickerController()
             
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        posts = []
         
         imagePicker.delegate = self
         imagePicker.sourceType = .camera
         imagePicker.allowsEditing = false
-
-        // Firestore에서 데이터 가져오기
-        db.collection(K.collection).order(by: K.date, descending: true).getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let data = document.data()
-                    if let imageURL = data[K.imageUI] as? String, let date = data[K.date] as? String, let text = data[K.text] as? String, let user = data[K.userID] as? String, let category = data[K.category] as? String, let likes = data[K.likedUserIDs] as? [String] {
-                        let likesSet = Set(likes)
-                        let newPost = Post(userID: user, imageUI: imageURL, date: date, text: text, likedUserIDs: likesSet, category: category, document: document.documentID)
-                        self.posts.append(newPost)
-                    }
-                }
-
-                // Firestore 데이터 로드 완료 후 UI 업데이트
-                DispatchQueue.main.async {
-                    self.updateHomeView()
-                }
-            }
+        
+        db.loadFullData {
+            self.updateHomeView()
         }
-
+        
         // 나머지 UI 설정
         setupNavigationBar()
         setupHomeViewLayout()
@@ -61,11 +42,17 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
         homeView.likeButton.addTarget(self, action: #selector(heartButtonPressed), for: .touchUpInside)
         homeView.cameraButton.addTarget(self, action: #selector(cameraButtonPressed), for: .touchUpInside)
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        DispatchQueue.main.async {
+            self.homeView.progressesTableView.reloadData()
+        }
+    }
 
     func updateHomeView() {
-        if !posts.isEmpty {
-            randomInt = Int.random(in: 0..<posts.count)
-            let post = posts[randomInt]
+        if  !postManager.emptyCheck() {
+            randomInt = Int.random(in: 0 ..< postManager.getPostsCount())
+            let post = postManager.getPost(randomInt)
 
             if let email = Auth.auth().currentUser?.email {
                 self.updateLikeUI(for: self.randomInt, userEmail: email)
@@ -89,7 +76,13 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
     func setupNavigationBar() {
         let barButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: #selector(rightButtonItemPressed))
         barButtonItem.image = UIImage(systemName: "person.fill")
+        
+        
+        let reloadButton = UIBarButtonItem(title: "", style: .plain, target: self, action: #selector(reloadButtonTapped))
+        reloadButton.image = UIImage(systemName: "arrow.clockwise")
+        
         self.navigationItem.rightBarButtonItems = [barButtonItem]
+        self.navigationItem.leftBarButtonItem = reloadButton
     }
 
     func setupHomeViewLayout() {
@@ -117,40 +110,46 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
+    @objc func reloadButtonTapped() {
+        DispatchQueue.main.async {
+            self.updateHomeView()
+        }
+    }
+    
     @objc func recommendPostTapped() {
         let postDetail = PostDetailViewController()
-        postDetail.post = posts[randomInt]
+        postDetail.post = postManager.getPost(randomInt)
         self.navigationController?.pushViewController(postDetail, animated: true)
     }
     
     @objc func heartButtonPressed() {
         if let userEmail = Auth.auth().currentUser?.email {
             let index = self.randomInt
-            let documentID = posts[index].document
-            let isLiked = posts[index].likedUserIDs.contains(userEmail)
+            let documentID = postManager.getPost(index).document
+            let isLiked = postManager.getPost(index).likedUserIDs.contains(userEmail)
 
             if !isLiked {
-                db.collection(K.collection).document(documentID).updateData([
+                db.db.collection(K.collection).document(documentID).updateData([
                     K.likedUserIDs: FieldValue.arrayUnion([userEmail])
                 ]) { error in
                     if let e = error {
                         print(e)
                     } else {
                         DispatchQueue.main.async {
-                            self.posts[index].likedUserIDs.insert(userEmail)
+                            self.postManager.likePost(index, userEmail)
                             self.updateLikeUI(for: index, userEmail: userEmail)
                         }
                     }
                 }
             } else {
-                db.collection(K.collection).document(documentID).updateData([
+                db.db.collection(K.collection).document(documentID).updateData([
                     K.likedUserIDs: FieldValue.arrayRemove([userEmail])
                 ]) { error in
                     if let e = error {
                         print(e)
                     } else {
                         DispatchQueue.main.async {
-                            self.posts[index].likedUserIDs.remove(userEmail)
+                            self.postManager.dislikePost(index, userEmail)
                             self.updateLikeUI(for: index, userEmail: userEmail)
                         }
                     }
@@ -166,9 +165,8 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
     //MARK: - Functions
 
     func updateLikeUI(for index: Int, userEmail: String) {
-        homeView.likeCountLabel.text = String(posts[index].likedUserIDs.count)
-        //알고리즘이 잘못됨
-        if posts[index].likedUserIDs.contains(userEmail) {
+        homeView.likeCountLabel.text = String(postManager.getPost(index).likedUserIDs.count)
+        if postManager.getPost(index).likedUserIDs.contains(userEmail) {
             homeView.likeButton.tintColor = .red
         } else {
             homeView.likeButton.tintColor = .gray
@@ -182,16 +180,17 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
 extension HomeViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return used.count
+        return self.categories.getCategoriesUsed().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = homeView.progressesTableView.dequeueReusableCell(withIdentifier: ProgressTableViewCell.identifier, for: indexPath) as! ProgressTableViewCell
-        let (iconLabel, progress) = (used[indexPath.row])
-        
-        cell.iconLabel.text = iconLabel.name
-        cell.progressBar.progress = Float(progress)
+        let category = categories.getCategoriesUsed()[indexPath.row]
 
+        let totalUsage = categories.getTotalUsage()
+        cell.iconLabel.text = category.name
+        cell.progressBar.progress = category.usage/totalUsage
+        
         return cell
     }
 }
@@ -202,8 +201,8 @@ extension HomeViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         if let UserImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            let result = CameraViewController()
-            result.UserImage = UserImage
+            let result = PhotoResultViewController()
+            result.userImage = UserImage
             self.navigationController?.pushViewController(result, animated: true)
         }
         

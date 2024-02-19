@@ -16,7 +16,7 @@ class ModelHandler {
 
     init() {
         do {
-            let coreMLModel = try WasteManagerML_ver_2(configuration: MLModelConfiguration())
+            let coreMLModel = try WasteManagerML_3(configuration: MLModelConfiguration())
             model = try VNCoreMLModel(for: coreMLModel.model)
         } catch {
             fatalError("Loading model failed")

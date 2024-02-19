@@ -45,7 +45,6 @@ class UserView: UIView {
     let progressesView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = .white // 배경색 변경
         return tableView
     }()
     
@@ -65,7 +64,6 @@ class UserView: UIView {
         layout.minimumInteritemSpacing = 2
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .white // 배경색 변경
         return collectionView
     }()
     
