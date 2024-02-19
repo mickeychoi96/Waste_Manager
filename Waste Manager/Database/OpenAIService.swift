@@ -8,7 +8,7 @@
 import OpenAI
 
 class OpenAIService {
-    let openAI = OpenAI(apiToken: "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")
+    let openAI = OpenAI(apiToken: "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")
     
     func getAIService(prompt: String, completion: @escaping(String) -> Void) {
         let query = ChatQuery(model: .gpt3_5Turbo, messages: [.init(role: .user, content: prompt)])
