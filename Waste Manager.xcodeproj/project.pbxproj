@@ -102,6 +102,7 @@
 		B35C18B12B1876B800DBCA06 /* PhotoResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoResultViewController.swift; sourceTree = "<group>"; };
 		B35C18B32B1894FD00DBCA06 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		B3A52B962B19C98F00C56456 /* RecommendPostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendPostCollectionViewCell.swift; sourceTree = "<group>"; };
+		B3B3B9042B86E24200F50012 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		B3C00F312AF92A6500FD1B99 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		B3C00F332AF92A8300FD1B99 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		B3C00F372AF92A9E00FD1B99 /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
@@ -222,6 +223,7 @@
 				B35423B52AEA9AAC00524DD8 /* Assets.xcassets */,
 				B35423B72AEA9AAC00524DD8 /* LaunchScreen.storyboard */,
 				B35423BA2AEA9AAC00524DD8 /* Info.plist */,
+				B3B3B9042B86E24200F50012 /* Config.xcconfig */,
 				B35C185D2B07B98100DBCA06 /* GoogleService-Info.plist */,
 				B35C18AA2B1738E100DBCA06 /* WasteManagerML_ver_2.mlmodel */,
 				B30DA64D2B50548F00CA9D6E /* WasteManagerML 3.mlmodel */,
@@ -444,6 +446,7 @@
 /* Begin XCBuildConfiguration section */
 		B35423BB2AEA9AAC00524DD8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B3B3B9042B86E24200F50012 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -507,6 +510,7 @@
 		};
 		B35423BC2AEA9AAC00524DD8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B3B3B9042B86E24200F50012 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -563,6 +567,7 @@
 		};
 		B35423BE2AEA9AAC00524DD8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B3B3B9042B86E24200F50012 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -593,6 +598,7 @@
 		};
 		B35423BF2AEA9AAC00524DD8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B3B3B9042B86E24200F50012 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

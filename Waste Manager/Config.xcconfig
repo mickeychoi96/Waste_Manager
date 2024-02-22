@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig
+//  Waste Manager
+//
+//  Created by 최유현 on 2/22/24.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+APIKey = 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

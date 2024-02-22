@@ -26,24 +26,29 @@ class Database {
         postManager.deleteAllPosts()
         
         db.collection(K.collection).order(by: K.date, descending: true).getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let data = document.data()
-                    if let imageURL = data[K.imageUI] as? String, let date = data[K.date] as? String, let text = data[K.text] as? String, let user = data[K.userID] as? String, let category = data[K.category] as? String, let likes = data[K.likedUserIDs] as? [String]{
-                        
-                        let likesSet = Set(likes)
-                        
-                        let newPost = Post(userID: user, imageUI: imageURL, date: date, text: text, likedUserIDs: likesSet, category: category, document: document.documentID)
-                        
-                        self.postManager.addPost(newPost)
-                    } else {
-                        print("error")
+            
+            DispatchQueue(label: "asdfsfd").async {
+                if let err = err {
+                    print("Error getting documents: \(err)")
+                } else {
+                    for document in querySnapshot!.documents {
+                        let data = document.data()
+                        if let imageURL = data[K.imageUI] as? String, let date = data[K.date] as? String, let text = data[K.text] as? String, let user = data[K.userID] as? String, let category = data[K.category] as? String, let likes = data[K.likedUserIDs] as? [String]{
+                            
+                            let likesSet = Set(likes)
+                            
+                            let newPost = Post(userID: user, imageUI: imageURL, date: date, text: text, likedUserIDs: likesSet, category: category, document: document.documentID)
+                            
+                            self.postManager.addPost(newPost)
+                        } else {
+                            print("error")
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        completion()
                     }
                 }
-                
-                completion()
             }
         }
     }

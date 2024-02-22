@@ -6,11 +6,13 @@
 //
 
 import OpenAI
+import Foundation
 
 class OpenAIService {
-    let openAI = OpenAI(apiToken: "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")
+    let openAIKey = Bundle.main.infoDictionary?["APIKey"] as! String
     
     func getAIService(prompt: String, completion: @escaping(String) -> Void) {
+        let openAI = OpenAI(apiToken: openAIKey.self)
         let query = ChatQuery(model: .gpt3_5Turbo, messages: [.init(role: .user, content: prompt)])
         var answer = ""
         
