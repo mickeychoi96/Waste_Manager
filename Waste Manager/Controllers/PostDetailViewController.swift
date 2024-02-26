@@ -108,11 +108,13 @@ class PostDetailViewController: UIViewController {
             }
             
             db.deletePost(post)
-            postManager.deletePost(post)
+            
+            NotificationCenter.default.post(name: NSNotification.Name("CommunityDataRefreshNotification"), object: nil)
+            NotificationCenter.default.post(name: NSNotification.Name("HomeDataRefreshNotification"), object: nil)
+            
+            
+            self.navigationController?.popViewController(animated: true)
         }
-        
-        
-        self.navigationController?.popViewController(animated: true)
     }
     
     func updateLikeUI(userEmail: String) {

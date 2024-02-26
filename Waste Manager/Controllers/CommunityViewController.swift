@@ -29,13 +29,14 @@ class CommunityViewController: UIViewController {
             communityView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             communityView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        
-        uiSetting()
-        reloadTableView()
+        db.LoadEachData(true) {
+            self.uiSetting()
+            self.reloadTableView()
+        }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        reloadTableView()
+    override func viewWillAppear(_ animated: Bool) {        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadCommunityPosts), name: NSNotification.Name("CommunityDataRefreshNotification"), object: nil)
     }
     
     private func uiSetting() {
@@ -58,7 +59,23 @@ class CommunityViewController: UIViewController {
     }
     
     @objc private func reloadButtonTapped() {
-        self.reloadTableView()
+        DispatchQueue(label: "sequence").sync {
+            postManager.deleteAllPosts()
+            db.isLastPage = false
+            self.db.LoadEachData(true) {
+                self.reloadTableView()
+            }
+        }
+    }
+    
+    @objc func reloadCommunityPosts() {
+        DispatchQueue(label: "sequence").sync {
+            postManager.deleteAllPosts()
+            db.isLastPage = false
+            self.db.LoadEachData(true) {
+                self.reloadTableView()
+            }
+        }
     }
     
     private func reloadTableView() {
@@ -79,7 +96,7 @@ class CommunityViewController: UIViewController {
 extension CommunityViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return postManager.getAllPosts().count
+        return postManager.getPostsCount()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -105,6 +122,17 @@ extension CommunityViewController: UITableViewDataSource {
         cell.postLikes.isHidden = true
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        print(indexPath.row, postManager.getPostsCount())
+        if indexPath.row == postManager.getPostsCount() - 1 {
+            if db.isLastPage == false {
+                db.LoadEachData(false){
+                    self.reloadTableView()
+                }
+            }
+        }
     }
 }
 

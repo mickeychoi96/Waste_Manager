@@ -27,7 +27,7 @@ class PhotoResultView: UIView {
     let confirmButton: UIButton = {
         let button = UIButton()
         button.setTitle("Yes, it is", for: .normal)
-        button.backgroundColor = K.mainColor
+        button.backgroundColor = UIColor(named: Color.mainColor)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 3
         return button
@@ -36,7 +36,7 @@ class PhotoResultView: UIView {
     let confirmButton_2: UIButton = {
         let button = UIButton()
         button.setTitle("No, it isn't", for: .normal)
-        button.backgroundColor = K.mainColor
+        button.backgroundColor = UIColor(named: Color.mainColor)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 3
         return button

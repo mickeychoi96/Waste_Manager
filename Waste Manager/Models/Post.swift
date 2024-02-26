@@ -26,6 +26,8 @@ class PostManager {
     
     private var posts: [Post] = []
     
+    private var recommendPost: [Post] = []
+    
     func getAllPosts() -> [Post] {
         return posts
     }
@@ -77,6 +79,32 @@ class PostManager {
         if let index = posts.firstIndex(where: { $0.document == updatedPost.document }) {
             posts[index] = updatedPost
         }
+    }
+    
+    //MARK: - Recommend Post Func
+    
+    func recommendPostAdd(_ post: Post) {
+        recommendPost.append(post)
+    }
+    
+    func getRecommendPost() -> Post {
+        return recommendPost[0]
+    }
+    
+    func recommendPostEmptyCheck() -> Bool {
+        return recommendPost.isEmpty
+    }
+    
+    func deleteRecommendPost() {
+        recommendPost.removeAll()
+    }
+    
+    func likeRecommendPost(_ userEmail: String) {
+        recommendPost[0].likedUserIDs.insert(userEmail)
+    }
+    
+    func dislikeRecommendPost(_ userEmail: String) {
+        recommendPost[0].likedUserIDs.remove(userEmail)
     }
 }
 

@@ -26,7 +26,7 @@ class CommunityTableViewCell: UITableViewCell {
     let postImage: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10
         return imageView
@@ -106,6 +106,16 @@ class CommunityTableViewCell: UITableViewCell {
             
             postDetail.topAnchor.constraint(equalTo: postDate.bottomAnchor, constant: 20),
         ])
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        postImage.image = UIImage(named: "Gray")
+        postDate.text = "0000"
+        postDetail.text = "default detail"
+        likeCount.text = "00"
+        likeButton.tintColor = .gray
     }
 
     required init?(coder: NSCoder) {

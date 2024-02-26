@@ -60,7 +60,6 @@ class NewPostViewController: UIViewController, UINavigationControllerDelegate {
                 case .success(let downloadURL):
                     let post = Post(userID: Auth.auth().currentUser!.email!, imageUI: downloadURL.absoluteString, date: Date().description, text: detail, likedUserIDs: [], category: self.category ?? "Default", document: "")
                     self.db.addPost(post)
-                    self.postManager.addPost(post)
                 case .failure(let error):
                     print("Error uploading image to Storage: \(error)")
                 }

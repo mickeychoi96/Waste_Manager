@@ -17,7 +17,7 @@ class CategoryManager {
     static let shared = CategoryManager()
 
     private let categoriesKey = "categoriesKey"
-    private var categories: [Category] = []
+    var categories: [Category] = []
 
     init() {
         loadCategories()

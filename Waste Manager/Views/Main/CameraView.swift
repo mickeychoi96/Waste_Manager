@@ -28,7 +28,7 @@ class CameraView: UIView {
         button.setTitle("Regenerate the Answer", for: .normal)
         button.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
         button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-        button.backgroundColor = UIColor(red: 93/255, green: 173/255, blue: 236/255, alpha: 1)// Blue Jeans
+        button.backgroundColor = UIColor(named: Color.mainColor)
         button.titleLabel?.textAlignment = .center
         button.tintColor = .white
         button.layer.cornerRadius = 10

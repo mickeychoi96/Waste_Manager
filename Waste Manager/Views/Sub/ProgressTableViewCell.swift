@@ -25,10 +25,10 @@ class ProgressTableViewCell: UITableViewCell {
         let progress = UIProgressView(progressViewStyle: .default)
         progress.translatesAutoresizingMaskIntoConstraints = false
         progress.trackTintColor = UIColor.lightGray // 프로그레스 바의 트랙 색상을 연한 회색으로 설정
-        progress.progressTintColor = UIColor(red: 102/255, green: 204/255, blue: 0/255, alpha: 1) // 진행 색상을 밝은 녹색으로 설정
+        progress.progressTintColor = UIColor(named: Color.brightGreen)
         progress.layer.cornerRadius = 8
         progress.clipsToBounds = true
-        progress.layer.sublayers![1].cornerRadius = 8 // 프로그레스 바 내부의 진행 부분에도 코너 라운드 적용
+        progress.layer.sublayers![1].cornerRadius = 8
         progress.subviews[1].clipsToBounds = true
         return progress
     }()

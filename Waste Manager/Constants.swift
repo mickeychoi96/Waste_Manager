@@ -16,6 +16,9 @@ struct K {
     static let likedUserIDs = "likedUserIDs"
     static let category = "category"
     static let document = "document"
-    
-    static let mainColor = UIColor(red: 93/255, green: 173/255, blue: 236/255, alpha: 1)
+}
+
+struct Color {
+    static let brightGreen = "BrightGreen"
+    static let mainColor = "MainColor"
 }

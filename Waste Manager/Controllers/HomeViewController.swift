@@ -20,6 +20,8 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
     
     let categories = CategoryManager.shared
     
+    let community = CommunityViewController()
+    
     var randomInt = 0
         
     let imagePicker = UIImagePickerController()
@@ -31,8 +33,10 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
         imagePicker.sourceType = .camera
         imagePicker.allowsEditing = false
         
-        db.loadFullData {
-            self.updateHomeView()
+        db.getRandomData {
+            DispatchQueue.main.async {
+                self.updateHomeView()
+            }
         }
         
         // 나머지 UI 설정
@@ -41,21 +45,24 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
         
         homeView.likeButton.addTarget(self, action: #selector(heartButtonPressed), for: .touchUpInside)
         homeView.cameraButton.addTarget(self, action: #selector(cameraButtonPressed), for: .touchUpInside)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
+        
         DispatchQueue.main.async {
             self.homeView.progressesTableView.reloadData()
         }
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadButtonTapped), name: NSNotification.Name("HomeDataRefreshNotification"), object: nil)
+    }
 
     func updateHomeView() {
-        if  !postManager.emptyCheck() {
-            randomInt = Int.random(in: 0 ..< postManager.getPostsCount())
-            let post = postManager.getPost(randomInt)
+        if  !postManager.recommendPostEmptyCheck() {
+            let post = postManager.getRecommendPost()
 
             if let email = Auth.auth().currentUser?.email {
-                self.updateLikeUI(for: self.randomInt, userEmail: email)
+                self.updateLikeUI(userEmail: email)
             }
             
             homeView.postDetailLabel.text = post.text
@@ -111,22 +118,24 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     @objc func reloadButtonTapped() {
-        DispatchQueue.main.async {
-            self.updateHomeView()
+        postManager.deleteRecommendPost()
+        db.getRandomData {
+            DispatchQueue.main.async {
+                self.updateHomeView()
+            }
         }
     }
     
     @objc func recommendPostTapped() {
         let postDetail = PostDetailViewController()
-        postDetail.post = postManager.getPost(randomInt)
+        postDetail.post = postManager.getRecommendPost()
         self.navigationController?.pushViewController(postDetail, animated: true)
     }
     
     @objc func heartButtonPressed() {
         if let userEmail = Auth.auth().currentUser?.email {
-            let index = self.randomInt
-            let documentID = postManager.getPost(index).document
-            let isLiked = postManager.getPost(index).likedUserIDs.contains(userEmail)
+            let documentID = postManager.getRecommendPost().document
+            let isLiked = postManager.getRecommendPost().likedUserIDs.contains(userEmail)
 
             if !isLiked {
                 db.db.collection(K.collection).document(documentID).updateData([
@@ -136,8 +145,8 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
                         print(e)
                     } else {
                         DispatchQueue.main.async {
-                            self.postManager.likePost(index, userEmail)
-                            self.updateLikeUI(for: index, userEmail: userEmail)
+                            self.postManager.likeRecommendPost(userEmail)
+                            self.updateLikeUI(userEmail: userEmail)
                         }
                     }
                 }
@@ -149,8 +158,8 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
                         print(e)
                     } else {
                         DispatchQueue.main.async {
-                            self.postManager.dislikePost(index, userEmail)
-                            self.updateLikeUI(for: index, userEmail: userEmail)
+                            self.postManager.dislikeRecommendPost(userEmail)
+                            self.updateLikeUI(userEmail: userEmail)
                         }
                     }
                 }
@@ -164,13 +173,17 @@ class HomeViewController: UIViewController, UINavigationControllerDelegate {
     
     //MARK: - Functions
 
-    func updateLikeUI(for index: Int, userEmail: String) {
-        homeView.likeCountLabel.text = String(postManager.getPost(index).likedUserIDs.count)
-        if postManager.getPost(index).likedUserIDs.contains(userEmail) {
+    func updateLikeUI(userEmail: String) {
+        homeView.likeCountLabel.text = String(postManager.getRecommendPost().likedUserIDs.count)
+        if postManager.getRecommendPost().likedUserIDs.contains(userEmail) {
             homeView.likeButton.tintColor = .red
         } else {
             homeView.likeButton.tintColor = .gray
         }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
 }

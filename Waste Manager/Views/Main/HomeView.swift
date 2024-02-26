@@ -15,7 +15,7 @@ class HomeView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "ReJoycle"
         label.textAlignment = .center
-        label.textColor = UIColor(red: 102/255, green: 204/255, blue: 0/255, alpha: 1) // 밝은 녹색
+        label.textColor = UIColor(named: Color.brightGreen) // 밝은 녹색
         label.font = UIFont(name: "HelveticaNeue-Bold", size: 45) // HelveticaNeue-Bold 폰트 사용
         return label
     }()
@@ -48,7 +48,7 @@ class HomeView: UIView {
     let postImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10
         return imageView
