@@ -2,8 +2,39 @@ REJOYCLE
 
 Application for help recycling more joyful
 
-If you want to read more details about the application, please read the 'Final Diploma'
+- **Purpose**
+1. To raise awareness about recycling and make the process more enjoyable.
+2. To help users categorize recyclables in a more engaging way.
 
+- **Application Structure**
+MVC (Model-View-Controller)
+
+- **Technologies Used**
+1. UIKit (UI/UX)
+2. Firebase (Database)
+3. CoreML (Core Feature)
+4. OpenAI API (Core Feature / Database)
+
+- **Application Scenarios**
+1. Main Screen: Displays recommended posts, tracks recycling status, and provides a button to recognize recyclable items.
+2. Post List Screen: Shows a list of posts with text and images of recyclables from all users.
+3. Post Detail Screen: Provides detailed information about the post selected by the user, including text and images.
+4. Add Post Screen: Allows users to upload pictures and descriptions of their recycling activities.
+5. Recycling Item Recognition Completion Screen: Displays the result of recognizing a recyclable item.
+6. Recycling Methods and Recommended Posts Screen: Provides recycling methods recommended by ChatGPT based on the recognition results and lists created by users.
+7. Login, Logout, and Sign-Up Screens: Handles user authentication.
+8. User Recycling Tracking and Post Screen: Tracks the user's recycling activities and displays their posts.
+9. Settings Screen: Allows users to adjust their app settings.
+
+This was a solo project, where I independently developed all features and designs.
+I incorporated as many functionalities as possible, using all the skills I had learned.
+The application’s direction and each feature were designed and planned in advance using UML diagrams.
+Since I placed a strong emphasis on the user's online experience, I used Firebase to enhance performance.
+I also integrated OpenAI API to provide users with diverse and quick recycling solutions.
+
+For more detailed information, please refer to the attached "Final Diploma."
+
+---------------------------------------------------------------------------------------------------------------------
 이 프로젝트는 다음과 같은 목적과 기술을 사용하여 제작되었습니다.
 
 - **목적**
